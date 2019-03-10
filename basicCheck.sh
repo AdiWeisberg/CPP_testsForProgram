@@ -11,16 +11,13 @@ echo $arguments
 cd $folderName
 if [ -f "Makefile" ]
 then #make file found
-    echo "there is a make file"
-    make &> outputMake.txt
-    successMake=$?
-    if [ $successMake -eq 0 ]
+    make &> /dev/null
+    if [ $? -eq 0 ]
     then #compilation successed
         compile="PASS"
         left=0
-        valgrind --leak-check=full --error-exitcode=1 ./$program &>outputMemory.txt 
-        res1=$?
-        if [ $res1 -eq 0 ]
+        valgrind --leak-check=full --error-exitcode=1 ./$program &>/dev/null
+        if [ $? -eq 0 ]
         then
             memory="PASS"
             mid=0
@@ -28,11 +25,9 @@ then #make file found
             memory="FAIL"
             mid=1
         fi
-        echo $memory
 
-        valgrind --tool=helgrind --error-exitcode=1 ./$program &>ourputTrace.txt
-        res2=$?
-        if [ $res2 -eq 0 ]
+        valgrind --tool=helgrind --error-exitcode=1 ./$program &>/dev/null
+        if [ $? -eq 0 ]
         then
             thread="PASS"
             right=0
@@ -40,7 +35,6 @@ then #make file found
             thread="FAIL"
             right=1
         fi
-        echo $thread
 
     else #compilation failed
         compile="FAIL"
@@ -49,11 +43,9 @@ then #make file found
         left=1
         right=1
         mid=1
-    
 
     fi
 else #no make file found
-    echo "exiting.."
     compile="FAIL"
     memory="FAIL"
     thread="FAIL"
@@ -68,7 +60,5 @@ echo -e "  "$compile"\t\t  "$memory"\t\t  "$thread
 # exiting by number: 
 
 math=$(($((4*$left)) + $((2*$mid)) + $((1*$right))))
-echo $math
+cd $currentLocation
 exit $math
-
-
